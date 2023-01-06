@@ -9,9 +9,13 @@ def load_config():
     config.read('config.ini')
     return config
 
+
 def get_directory(config):
     """Get the directory to search from the configuration file."""
     return config['PATHS']['tool_t_path']
+
+def get_graph_storage(config):
+    return config['PATHS']['graph_storage']
 
 def extract_data(filename):
     """Extract the tool names, DR values, and DL values from the file, ignoring rows where both values are zero."""
@@ -35,7 +39,7 @@ def extract_data(filename):
                 dls.append(dl)    
     return dr_names,dl_names, drs, dls
 
-def plot_data(filename, dr_names, dl_names, drs, dls):
+def plot_data(graph_storage, filename, dr_names, dl_names, drs, dls):
     # sourcery skip: extract-duplicate-method
     # Create a figure and axis
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 9), layout='constrained')
@@ -57,18 +61,19 @@ def plot_data(filename, dr_names, dl_names, drs, dls):
     # Tighten layout and show plot
     plt.xticks(rotation = 45)
     plt.suptitle(filename)
-    fig.savefig(os.path.join("./Data/plots/", f"{filename}.png"))
+    fig.savefig(os.path.join(graph_storage, f"{filename}.png"))
 
     
     plt.close()
 def main():
     config = load_config()
     directory = get_directory(config)
+    graph_storage = get_graph_storage(config)
     filenames = os.listdir(directory)
     for filename in filenames:
         full_path = os.path.join(directory, filename)
         dr_names, dl_names, drs, dls = extract_data(full_path)
-        plot_data(filename, dr_names, dl_names, drs, dls)
+        plot_data(graph_storage, filename, dr_names, dl_names, drs, dls)
 
 if __name__ == '__main__':
     main()
